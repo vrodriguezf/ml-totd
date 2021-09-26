@@ -6,7 +6,7 @@
 
 https://vrodriguezf.github.io/ml-totd/
 
-# My Blog
+# Machine learning Tip of The Day - Blog
 
 
 _powered by [fastpages](https://github.com/fastai/fastpages)_
