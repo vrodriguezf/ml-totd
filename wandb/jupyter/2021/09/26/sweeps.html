@@ -81,7 +81,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      1 min read
+      4 min read
     
 </span></p>
 
@@ -124,11 +124,10 @@ window.onload = wrap_img;
 <h1 id="Introduction">
 <a class="anchor" href="#Introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction<a class="anchor-link" href="#Introduction"> </a>
 </h1>
-<p>I often find myself coding a machine learning experiment in a Jupyter Notebook, and using <a href="https://www.wandb.com/">Weights &amp; Biases (wandb)</a> to visualize and track the results of the runs. When the experiment is drafted, I always have questions such as: How will the performance be affected by the parameter a? What if I change the number of items of the dataset, or change the dataset completely?</p>
-<p>Hyperpameter tuning with <a href="https://docs.wandb.com/sweeps">wandb sweeps</a> are a great tool to solve these questions. However, sweeping requires that you define a specific training program, as a separate python file. I find this to be redundant, specially when the code for training is already in the Jupyter Notebook. Furthermore, if I make some changes in the original notebook, I have to be sure that I change the sweep script too.</p>
-<p>This post shows a trick to execute a Jupyter Notebook as the program of a wandb sweep. This provides a frictionless way of using your Jupyter Notebooks both for single runs and sweep functions. We won't use any separate configuration or script file (unless doing it in Colab), everything will be done between Jupyter and wandb.</p>
-<p>As use case we will perform a time series classification task with deep neural networks using the wonderful library <a href="https://github.com/timeseriesAI/tsai">tsai</a>.
- This is all the code needed to train a classifier in <code>tsai</code> for the dataset <a href="http://www.timeseriesclassification.com/description.php?Dataset=NATOPS">NATOPS</a>:</p>
+<p>I often find myself coding a machine learning experiment in a Jupyter Notebook, and at the same time, using <a href="https://www.wandb.com/">Weights &amp; Biases (wandb)</a> to visualize and track the results of the runs. When the experiment is finished, I always have questions such as: How will the performance be affected by the parameter a? What if I change the number of items of the dataset, or change the dataset completely?</p>
+<p>Hyperpameter tuning with <a href="https://docs.wandb.com/sweeps">wandb sweeps</a> is a great tool to solve these questions. However, sweeping requires that you define a specific training program, as a separate python file. I find this to be redundant, specially when the code for training is already in the Jupyter Notebook. Furthermore, if I make some changes in the original notebook, I have to be sure that I change the sweep script too.</p>
+<p>This post shows a trick to execute a Jupyter Notebook as the program of a wandb sweep. This provides a frictionless way of using your Jupyter Notebooks both for single runs and sweep functions. We won't use any separate configuration or script file, everything will be done between Jupyter and wandb. This post assumes that the reader has basic knowledge on both how Jupyter Notebooks and wandb sweeps work.</p>
+<p>As use case we will perform a time series classification task with deep neural networks using the wonderful library <a href="https://github.com/timeseriesAI/tsai">tsai</a>. This is all the code needed to train a classifier in <code>tsai</code> for the dataset <a href="http://www.timeseriesclassification.com/description.php?Dataset=NATOPS">NATOPS</a>:</p>
 
 </div>
 </div>
@@ -159,7 +158,8 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In the next section, we'll see how to organize the notebook so that it is ready to be used in a sweep. Then, we'll configure it to be run in a local server (e.g, an instance of JupyterLab). Finally, for Colab users, we'll see a workaround to make this work with a subtle difference.</p>
+<p>We will do a hyperparameter search over the two arguments of the call to <code>fit_one_cycle</code>, that is, the number of epocs (<code>n_epochs</code>) and the maximum learning rate passed to the one-cycle schedule (<code>lr_max</code>).</p>
+<p>In the next section, we'll see how to organize the notebook so that it is ready to be used as the program of a sweep. Then, we'll configure it to be run in a local server (e.g, an instance of JupyterLab). Finally, for Colab users, we'll see a workaround to make this work with a subtle difference.</p>
 
 </div>
 </div>
@@ -170,6 +170,95 @@ window.onload = wrap_img;
 <h2 id="Refactoring-the-notebook-for-wandb-sweeps">
 <a class="anchor" href="#Refactoring-the-notebook-for-wandb-sweeps" aria-hidden="true"><span class="octicon octicon-link"></span></a>Refactoring the notebook for wandb sweeps<a class="anchor-link" href="#Refactoring-the-notebook-for-wandb-sweeps"> </a>
 </h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As explained in the <a href="https://docs.wandb.ai/guides/sweeps/python-api">wandb documentation</a>: "two components work together in a sweep: a controller on the central sweep server, which picks out new hyperparameter combinations to try, and <strong>agents</strong>, running in any number of processes on any number of machines, which query the server for hyperparameters, use them to run model training, and then report the results back to the controller."</p>
+<p>Each time the agent queries values of the hyperparameters for a new <em>trial</em>, those will be <em>injected</em> as part of the configuration of the wandb run that the training program must have. Once the program executes the call to <code>wandb.init</code> to begin the syncing, the object <code>wandb.config</code> will contain them, and any line of code that depends on that config will use the values pof that trial.</p>
+<p>But, what happens if we had already defined a configuration object like the one below, before the call to <code>wandb.init</code> to play manually with different values?</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'n_epochs'</span> <span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
+    <span class="s1">'lr_max'</span> <span class="p">:</span> <span class="mf">1e-3</span><span class="p">,</span>
+    <span class="s1">'bs'</span> <span class="p">:</span> <span class="mi">64</span>
+<span class="p">}</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">wandb</span>
+<span class="n">run</span> <span class="o">=</span> <span class="n">wandb</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'disabled'</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The good thing is that, nothing happens! Even if we have set values for <code>n_epochs</code> and <code>lr_max</code> before calling <code>wandb.init</code>, the sweep agent will override them with the values of the new trial. This is a <a href="https://docs.wandb.ai/guides/sweeps/faq">common question</a> explained in the wandb docs, and it is exactly what allows us to use the same exact notebook for both single runs and sweeps. Parameters that are not part of the sweep, such as <code>bs</code> in this example, can be part of the config object as well and of course they will be kept there by the sweep agent.</p>
+<p>The last thing we have to do is, as in every sweep, replace our magic numbers (at least the ones that are part of the sweep) with the corresponding reference to the config variable:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">tsai.all</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">dsid</span> <span class="o">=</span> <span class="s1">'NATOPS'</span> 
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">splits</span> <span class="o">=</span> <span class="n">get_UCR_data</span><span class="p">(</span><span class="n">dsid</span><span class="p">,</span> <span class="n">return_split</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">learn</span> <span class="o">=</span> <span class="n">TSClassifier</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">splits</span><span class="o">=</span><span class="n">splits</span><span class="p">,</span> <span class="n">bs</span><span class="o">=</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">bs</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span> <span class="n">batch_tfms</span><span class="o">=</span><span class="p">[</span><span class="n">TSStandardize</span><span class="p">()],</span> <span class="n">arch</span><span class="o">=</span><span class="n">InceptionTime</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">accuracy</span><span class="p">)</span>
+<span class="n">learn</span><span class="o">.</span><span class="n">fit_one_cycle</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">n_epochs</span><span class="p">,</span> <span class="n">lr_max</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">lr_max</span><span class="p">)</span>
+<span class="n">learn</span><span class="o">.</span><span class="n">plot_metrics</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>So that's basically all you have to do to make your notebook ready for both single experiments &amp; sweeping, just moving your magic numbers that you want to sweep over to an initial config object that will be passed to <code>wandb.init</code>.</p>
+
 </div>
 </div>
 </div>
