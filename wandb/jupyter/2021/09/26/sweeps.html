@@ -105,7 +105,7 @@ window.onload = wrap_img;
 <li class="toc-entry toc-h1"><a href="#Introduction">Introduction </a>
 <ul>
 <li class="toc-entry toc-h2"><a href="#Refactoring-the-notebook-for-wandb-sweeps">Refactoring the notebook for wandb sweeps </a></li>
-<li class="toc-entry toc-h2"><a href="#Running-the-sweep-in-a-local-server">Running the sweep in a local server </a></li>
+<li class="toc-entry toc-h2"><a href="#Sweeping-in-a-local-server">Sweeping in a local server </a></li>
 <li class="toc-entry toc-h2"><a href="#Running-the-sweep-in-Google-Colab">Running the sweep in Google Colab </a></li>
 </ul>
 </li>
@@ -257,7 +257,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>So that's basically all you have to do to make your notebook ready for both single experiments &amp; sweeping, just moving your magic numbers that you want to sweep over to an initial config object that will be passed to <code>wandb.init</code>.</p>
+<p>So that's basically all you have to do to make your notebook ready for both single experiments &amp; sweepin: move your magic numbers that you want to sweep over to an initial config object, and pass that as config to <code>wandb.init</code>.</p>
 
 </div>
 </div>
@@ -265,9 +265,31 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Running-the-sweep-in-a-local-server">
-<a class="anchor" href="#Running-the-sweep-in-a-local-server" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running the sweep in a local server<a class="anchor-link" href="#Running-the-sweep-in-a-local-server"> </a>
+<h2 id="Sweeping-in-a-local-server">
+<a class="anchor" href="#Sweeping-in-a-local-server" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sweeping in a local server<a class="anchor-link" href="#Sweeping-in-a-local-server"> </a>
 </h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There are many ways to create the configuration of a new sweep for wandb:</p>
+<ul>
+<li>Use the graphical user interface</li>
+<li>Create a separate yaml file</li>
+<li>Define it somewhere in your notebook as a dictionary or a JSON object</li>
+</ul>
+<p>I like to use directly the graphical interface. In this way, I don't have to create a separate <code>yaml</code> file, and I don't have to touch my notebook, which makes everything cleaner. If you have never created a sweep using the wandb interface, there's a big button "Create new sweep" on the top-right corner of the sweeps tab</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="https://i.imgur.com/ho9rG5O.png" alt="" title="Lets go up!"></p>
+
 </div>
 </div>
 </div>
