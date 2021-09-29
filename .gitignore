@@ -17,3 +17,4 @@ __pycache__
 .env
 *-checkpoint
 .ipynb_checkpoints
+_notebooks/wandb
