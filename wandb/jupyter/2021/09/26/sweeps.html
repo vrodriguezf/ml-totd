@@ -81,7 +81,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      4 min read
+      8 min read
     
 </span></p>
 
@@ -105,8 +105,9 @@ window.onload = wrap_img;
 <li class="toc-entry toc-h1"><a href="#Introduction">Introduction </a>
 <ul>
 <li class="toc-entry toc-h2"><a href="#Refactoring-the-notebook-for-wandb-sweeps">Refactoring the notebook for wandb sweeps </a></li>
-<li class="toc-entry toc-h2"><a href="#Sweeping-in-a-local-server">Sweeping in a local server </a></li>
-<li class="toc-entry toc-h2"><a href="#Running-the-sweep-in-Google-Colab">Running the sweep in Google Colab </a></li>
+<li class="toc-entry toc-h2"><a href="#Configuring-the-sweep">Configuring the sweep </a></li>
+<li class="toc-entry toc-h2"><a href="#Conclusions">Conclusions </a></li>
+<li class="toc-entry toc-h2"><a href="#Acknowledgments">Acknowledgments </a></li>
 </ul>
 </li>
 </ul><!--
@@ -143,7 +144,9 @@ window.onload = wrap_img;
 
 <span class="n">dsid</span> <span class="o">=</span> <span class="s1">'NATOPS'</span> 
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">splits</span> <span class="o">=</span> <span class="n">get_UCR_data</span><span class="p">(</span><span class="n">dsid</span><span class="p">,</span> <span class="n">return_split</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">learn</span> <span class="o">=</span> <span class="n">TSClassifier</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">splits</span><span class="o">=</span><span class="n">splits</span><span class="p">,</span> <span class="n">bs</span><span class="o">=</span><span class="p">[</span><span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span> <span class="n">batch_tfms</span><span class="o">=</span><span class="p">[</span><span class="n">TSStandardize</span><span class="p">()],</span> <span class="n">arch</span><span class="o">=</span><span class="n">InceptionTime</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">accuracy</span><span class="p">)</span>
+<span class="n">learn</span> <span class="o">=</span> <span class="n">TSClassifier</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">splits</span><span class="o">=</span><span class="n">splits</span><span class="p">,</span> <span class="n">bs</span><span class="o">=</span><span class="p">[</span><span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span> 
+                     <span class="n">batch_tfms</span><span class="o">=</span><span class="p">[</span><span class="n">TSStandardize</span><span class="p">()],</span> <span class="n">arch</span><span class="o">=</span><span class="n">InceptionTime</span><span class="p">,</span> 
+                     <span class="n">metrics</span><span class="o">=</span><span class="n">accuracy</span><span class="p">)</span>
 <span class="n">learn</span><span class="o">.</span><span class="n">fit_one_cycle</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">lr_max</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
 <span class="n">learn</span><span class="o">.</span><span class="n">plot_metrics</span><span class="p">()</span>
 </pre></div>
@@ -242,7 +245,9 @@ window.onload = wrap_img;
 
 <span class="n">dsid</span> <span class="o">=</span> <span class="s1">'NATOPS'</span> 
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">splits</span> <span class="o">=</span> <span class="n">get_UCR_data</span><span class="p">(</span><span class="n">dsid</span><span class="p">,</span> <span class="n">return_split</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">learn</span> <span class="o">=</span> <span class="n">TSClassifier</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">splits</span><span class="o">=</span><span class="n">splits</span><span class="p">,</span> <span class="n">bs</span><span class="o">=</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">bs</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span> <span class="n">batch_tfms</span><span class="o">=</span><span class="p">[</span><span class="n">TSStandardize</span><span class="p">()],</span> <span class="n">arch</span><span class="o">=</span><span class="n">InceptionTime</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">accuracy</span><span class="p">)</span>
+<span class="n">learn</span> <span class="o">=</span> <span class="n">TSClassifier</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">splits</span><span class="o">=</span><span class="n">splits</span><span class="p">,</span> <span class="n">bs</span><span class="o">=</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">bs</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span> 
+                     <span class="n">batch_tfms</span><span class="o">=</span><span class="p">[</span><span class="n">TSStandardize</span><span class="p">()],</span> <span class="n">arch</span><span class="o">=</span><span class="n">InceptionTime</span><span class="p">,</span> 
+                     <span class="n">metrics</span><span class="o">=</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">cbs</span><span class="o">=</span><span class="p">[</span><span class="n">WandbCallback</span><span class="p">(</span><span class="n">log_preds</span><span class="o">=</span><span class="kc">False</span><span class="p">)])</span>
 <span class="n">learn</span><span class="o">.</span><span class="n">fit_one_cycle</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">n_epochs</span><span class="p">,</span> <span class="n">lr_max</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">lr_max</span><span class="p">)</span>
 <span class="n">learn</span><span class="o">.</span><span class="n">plot_metrics</span><span class="p">()</span>
 </pre></div>
@@ -265,8 +270,8 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Sweeping-in-a-local-server">
-<a class="anchor" href="#Sweeping-in-a-local-server" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sweeping in a local server<a class="anchor-link" href="#Sweeping-in-a-local-server"> </a>
+<h2 id="Configuring-the-sweep">
+<a class="anchor" href="#Configuring-the-sweep" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuring the sweep<a class="anchor-link" href="#Configuring-the-sweep"> </a>
 </h2>
 </div>
 </div>
@@ -288,7 +293,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><img src="https://i.imgur.com/ho9rG5O.png" alt="" title="Lets go up!"></p>
+<p><img src="https://i.imgur.com/N5IyrTw.png" alt="" title="Create sweeps using the wandb interface"></p>
 
 </div>
 </div>
@@ -296,9 +301,117 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Running-the-sweep-in-Google-Colab">
-<a class="anchor" href="#Running-the-sweep-in-Google-Colab" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running the sweep in Google Colab<a class="anchor-link" href="#Running-the-sweep-in-Google-Colab"> </a>
+<p>You will see a nice YAML editor in which you have to define the parameters of the sweep, as well metric to optimize. You can also assign a name, a description, a method (we will use bayes here) and <a href="https://docs.wandb.ai/guides/sweeps/configuration">many more</a>. Below you can see how a sweep to search over the parameters <code>n_epoch</code> and <code>lr_max</code> with respect to the validation loss would look like, but wait until you press the "Initialize sweep" button...</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="https://i.imgur.com/LKzR0uX.png" alt="" title="Sweep configuration with the default value for the program: train.py"></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The trick comes with the <code>program</code> attribute. By default, wandb expects that you have defined a Python script called <code>train.py</code>, that contains your experiment synchronized with wandb. Our program is a Jupyter notebook though, so we will change this with the <strong>absolute path of our notebook in our Jupyter server</strong>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<div class="highlight"><pre><span></span><span class="nt">program</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/home/victor/work/_notebooks/2021-09-26-sweeps.ipynb</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The question is: How are we going to execute the notebook? Obviously, if we run the sweep like this, wandb will try to execute the notebook as a Python script and the agent will crash. To solve this, we use the <a href="https://docs.wandb.ai/guides/sweeps/configuration#command"><code>command</code> key</a>. This configuration key tells the wandb agent the command structure for invoking and passing arguments to the training script. By default, it is defined as:</p>
+<div class="highlight"><pre><span></span><span class="nt">command</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">${env}</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">${interpreter}</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">${program}</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">${args}</span>
+</pre></div>
+<p>where <code>${env}</code> is <code>/usr/bin/env</code> (in UNIX systems), <code>${interpreter}</code> expands to python, <code>${program}</code> is the file path of our training script (a notebook in our case), and <code>${args}</code> contain possible parameters of the classic form <code>--param1=value1</code>.</p>
+<p>However, we can redefine the <code>command</code> as we wish. More specifically, to execute a notebook, we can make use of the <code>nbconvert</code> tool, part of the Jupyter ecosystem. The exact shell command that we have to type to execute the notebook is:</p>
+<div class="highlight"><pre><span></span>jupyter nbconvert --to notebook --execute <span class="si">${</span><span class="nv">program</span><span class="si">}</span>
+</pre></div>
+<p>Since the sweep expects the command to be in <em>exec form</em> instead of <em>shell form</em>, we will add it to the sweep config as:</p>
+<div class="highlight"><pre><span></span><span class="nt">command</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">"jupyter"</span><span class="p p-Indicator">,</span> <span class="s">"nbconvert"</span><span class="p p-Indicator">,</span> <span class="s">"--to"</span><span class="p p-Indicator">,</span> <span class="s">"notebook"</span><span class="p p-Indicator">,</span> <span class="s">"--execute"</span><span class="p p-Indicator">,</span> <span class="s">"${program}"</span><span class="p p-Indicator">]</span>
+</pre></div>
+<p>And that's it! Now you can press the big blue "Initialize sweep button", and wandb will prompt you with a command to start an wandb agent that runs the sweep:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="https://i.imgur.com/pvsZ74J.png" alt="" title="To start the sweep, copy the agent command in a terminal"></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Just copy that <code>wandb agent</code> into a terminal in your server and the sweep will start. You can create multiple instances of your agent in one or multiple machines. I use this a lot to use at once all the GPUs of my system in the sweep. As explained in <a href="https://wandb.ai/site/articles/multi-gpu-sweeps">this blog post</a>, it is just a matter of fixing the env variable <code>CUDA_VISIBLE_DEVICES</code> in each of the calls to the agent:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<div class="highlight"><pre><span></span>$ <span class="nv">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="m">0</span> wandb agent vrodriguezf90/dummy_sweep/gs9p78yg
+</pre></div>
+<div class="highlight"><pre><span></span>$ <span class="nv">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="m">1</span> wandb agent vrodriguezf90/dummy_sweep/gs9p78yg
+</pre></div>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Conclusions">
+<a class="anchor" href="#Conclusions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Conclusions<a class="anchor-link" href="#Conclusions"> </a>
 </h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If you are like me, and always procastinate doing hyperparameter tuning because of the extra boilerplate needed to make it work, this can be really useful when you work in Jupyter Notebooks. Since this post is in itself a Jupyter Notebook (Yes, you can write blog posts using Jupyter with <a href="https://github.com/fastai/fastpages">this awesome tool!</a>), I used it as a program for the sweep that was described in the previous section, and everything worked like a charm. You can visualize the sweep here.</p>
+<p>Finally, it is worth to mention that the use of the tool <code>nbconvert</code> in each trial of the sweep creates a bit of overhead, which can be annoying, specially for small sweeps. There are multiple options to overcome this overhead, such as transforming the notebook into a script before configuring the sweep, or using faster tools to convert the notebook into a script such as the function <code>nb2py</code> from the <code>tsai</code> library.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Acknowledgments">
+<a class="anchor" href="#Acknowledgments" aria-hidden="true"><span class="octicon octicon-link"></span></a>Acknowledgments<a class="anchor-link" href="#Acknowledgments"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Thakn you to Ignacio Oguiza (El Gurú), for encouraging me to write this blog post, and for all the wonderful work and knowledge he puts into the tsai library.</p>
+
 </div>
 </div>
 </div>
